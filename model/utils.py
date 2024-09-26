@@ -2,8 +2,11 @@ import os
 import google.generativeai as genai
 #from model.prompts import chatbot_prompt
 from settings.base import setup_logger
+from build.actions import Actions
 
 logger = setup_logger()
+
+actions = Actions()
 
 def create_model(api_key, profile):
     """
@@ -20,9 +23,10 @@ def create_model(api_key, profile):
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
-                    model_name="gemini-1.5-pro",
+                    model_name="gemini-1.5-flash",
                     generation_config=generation_config,
-                    system_instruction= "You are an SAP expert",
+                    system_instruction= f"You are an SAP expert use the data from {actions.get_employee_details()} to answer questions",
+                    tools=[actions.get_employee_details]
                     )
         logger.info("Model created successfully")
         return model
@@ -39,7 +43,8 @@ def generate_content(model, message):
         # msg = f"Query:{message}/n/n Every time you provide something please confirm from the user if the identified details are correct. If they are correct, suggest the next healthy meal with the detailed recipe. If any details are incorrect, please ask for additional information."
         response = model.generate_content(message)
         logger.info(f"Generated content for message")
-        return response.text
+        logger.info(response)
+        return response.candidates[0].content.parts[0]
     except Exception as e:
         logger.error(f"Error generating content for message: {e}")
         return f"Error generating content: {e}"

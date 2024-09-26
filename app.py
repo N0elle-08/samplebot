@@ -2,14 +2,17 @@ import os
 import streamlit as st
 from streamlit_chat import message
 from model.utils import create_model, setup_logger, generate_content
+from build.intents import funct_call
+
 import google.generativeai as genai
 import base64
-from settings.base import setup_logger
+from settings.base import setup_logger, GOOGLE_API_KEY
 import json
 from datetime import datetime
-
+import requests
 # Set up logging
 logger = setup_logger()
+# Initialize the classes
 
 # Initialize session state variables
 if 'history' not in st.session_state:
@@ -88,11 +91,18 @@ def conversation_chat(file_path, text_prompt):
         
         st.session_state.history.append(user_entry)
 
-        response_text = generate_content(st.session_state.model, st.session_state.history)
+        response = generate_content(st.session_state.model, st.session_state.history)
+
+        if response.text:
+            bot_rep = response.text
+        elif response.function_call:
+            fc = response.function_call
+            bot_rep = funct_call(fc.name, fc.args)
+            print(bot_rep)
             
         bot_entry = {
             "role": "model",
-            "parts": response_text
+            "parts": bot_rep
         }
             
         st.session_state.history.append(bot_entry)
@@ -100,14 +110,14 @@ def conversation_chat(file_path, text_prompt):
         logger.info("Conversation successfully processed")
        
     except Exception as e:
-        logger.error(f"Error processing file: {e}")
+        logger.error(f"Error processing input: {e}")
         st.session_state.history.append("Error")
 
 def display_chat():
     """
     Display chat input and responses.
     """
-    st.title("🤖")
+   # st.title("🤖")
     
     chat_container = st.container()
     upload_container = st.container()
@@ -132,6 +142,7 @@ def display_chat():
         for i, entry in enumerate(st.session_state.history):
             if entry['role'] == 'user': 
                 if len(entry['parts']) > 1:
+                    print("im heres")
                     uploaded_file = entry['parts'][0]
                     base_file_name = os.path.basename(uploaded_file.display_name)
                     if uploaded_file.mime_type.startswith("image/"):
@@ -165,7 +176,8 @@ def main():
     st.set_page_config(page_title="🤖")
 
     if st.session_state.model is None:
-        st.session_state.model = create_model("AIzaSyAJnWQ8yHqL7CLpJoz9kz2HDSCHFZReGBE", {})
+        print(GOOGLE_API_KEY)
+        st.session_state.model = create_model(GOOGLE_API_KEY, {})
 
     display_chat()
 

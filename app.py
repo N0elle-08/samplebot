@@ -98,7 +98,6 @@ def conversation_chat(file_path, text_prompt):
         elif response.function_call:
             fc = response.function_call
             bot_rep = funct_call(fc.name, fc.args)
-            print(bot_rep)
             
         bot_entry = {
             "role": "model",
@@ -142,7 +141,6 @@ def display_chat():
         for i, entry in enumerate(st.session_state.history):
             if entry['role'] == 'user': 
                 if len(entry['parts']) > 1:
-                    print("im heres")
                     uploaded_file = entry['parts'][0]
                     base_file_name = os.path.basename(uploaded_file.display_name)
                     if uploaded_file.mime_type.startswith("image/"):
@@ -176,7 +174,6 @@ def main():
     st.set_page_config(page_title="🤖")
 
     if st.session_state.model is None:
-        print(GOOGLE_API_KEY)
         st.session_state.model = create_model(GOOGLE_API_KEY, {})
 
     display_chat()

@@ -1,19 +1,18 @@
 import os
 import google.generativeai as genai
-#from model.prompts import chatbot_prompt
+from model.prompts import sys_instructions
 from settings.base import setup_logger
-from build.actions import Actions
+
 
 logger = setup_logger()
 
-actions = Actions()
 
 def create_model(api_key, profile):
     """
     Create a GenerativeModel instance using the provided API key.
     """
     generation_config = {
-    "temperature": 0.8,
+    "temperature": 0.9,
     "top_p": 0.95,
     "top_k": 64,
     "max_output_tokens": 8192,
@@ -25,8 +24,8 @@ def create_model(api_key, profile):
         model = genai.GenerativeModel(
                     model_name="gemini-1.5-flash",
                     generation_config=generation_config,
-                    system_instruction= f"You are an SAP expert use the data from {actions.get_employee_details()} to answer questions",
-                    tools=[actions.get_employee_details]
+                    system_instruction= sys_instructions(),
+                    #tools=[actions.get_employee_details]
                     )
         logger.info("Model created successfully")
         return model

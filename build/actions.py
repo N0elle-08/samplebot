@@ -5,8 +5,9 @@ import requests
 from hdbcli import dbapi
 from hana_ml.dataframe import ConnectionContext
 from hana_ml import dataframe as df
-from settings.base import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_SCHEMA
+from settings.base import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_SCHEMA, setup_logger
 
+logger = setup_logger()
 class Actions:
     def __init__(self):
         pass
@@ -19,19 +20,29 @@ class Actions:
 
         return cc
     
-    def get_employee_details(self):
+    def get_details(self, tab_name):
         """
         Fetch employee details from the connected database.
         """
         cc = self.db_connection()
         schema = DB_SCHEMA
-        query = f"SELECT * FROM {schema}.COS_EMPINFO"
+        query = f"SELECT * FROM {schema}.{tab_name}"
         emp_df = df.DataFrame(cc, query)
         # Collect the result as a Pandas DataFrame
         emp_pandas_df = emp_df.collect()
 
-        table_format = emp_pandas_df.to_string(index=False)
+         # Convert the Pandas DataFrame to a list of dictionaries
+        result_dict = emp_pandas_df.to_dict(orient='records')
 
-        return table_format
+        logger.info(f"Retrieved data from {tab_name}")
+        logger.info(result_dict)  # Log the result as a dictionary
+
+        return result_dict 
+
+        # table_format = emp_pandas_df.to_string(index=False)
+        
+        # logger.info(f"retrieved data from {tab_name}")
+        # logger.info(table_format)
+        # return table_format
 
 

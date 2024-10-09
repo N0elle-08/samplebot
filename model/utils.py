@@ -2,10 +2,12 @@ import os
 import google.generativeai as genai
 from model.prompts import sys_instructions
 from settings.base import setup_logger
+from build.actions import Actions
+from build.func_tools import tools_func
 
 
 logger = setup_logger()
-
+actions = Actions()
 
 def create_model(api_key, profile):
     """
@@ -25,8 +27,8 @@ def create_model(api_key, profile):
                     model_name="gemini-1.5-flash",
                     generation_config=generation_config,
                     system_instruction= sys_instructions(),
-                    #tools=[actions.get_employee_details]
-                    )
+                    tools=tools_func
+                    )   
         logger.info("Model created successfully")
         return model
     except Exception as e:

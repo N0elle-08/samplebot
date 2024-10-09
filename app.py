@@ -92,12 +92,14 @@ def conversation_chat(file_path, text_prompt):
         st.session_state.history.append(user_entry)
 
         response = generate_content(st.session_state.model, st.session_state.history)
-
         if response.text:
             bot_rep = response.text
+            if response.function_call:
+                fc = response.function_call
+                bot_rep = funct_call(fc.name, dict(fc.args))
         elif response.function_call:
             fc = response.function_call
-            bot_rep = funct_call(fc.name, fc.args)
+            bot_rep = funct_call(fc.name, dict(fc.args))
             
         bot_entry = {
             "role": "model",

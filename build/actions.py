@@ -94,18 +94,20 @@ class Actions:
 
         emp = self.get_emp_details(args["empname"])
         args["isdraft"] = "0"
-        args["empid"] = str(emp["EMPID"][0])
-        args["emppos"] = str(emp["EMPPOS"][0])
-        args["supid"] = str(emp["SUPID"][0])
-        args["division"] = str(emp["DIVISION"][0])
-        args["dept"] = str(emp["DEPT"][0])
-        args["section"] = str(emp["SECTION"][0])
-        args["empemail"] = str(emp["EMPEMAIL"][0])
+        # args["empid"] = str(emp["EMPID"][0])
+        # args["emppos"] = str(emp["EMPPOS"][0])
+        # args["supid"] = str(emp["SUPID"][0])
+        # args["division"] = str(emp["DIVISION"][0])
+        # args["dept"] = str(emp["DEPT"][0])
+        # args["section"] = str(emp["SECTION"][0])
+        # args["empemail"] = str(emp["EMPEMAIL"][0])
 
-        
+        logger.info(args)
 
         response = requests.post(url, json=args, headers=headers)
+        logger.info(response)
         response_json = response.json()
+        logger.info(response)
         inci_id = response_json.get("ID")
         incident_id = response_json.get("INCID")
         if response.status_code == 201:

@@ -176,7 +176,7 @@ def main():
     st.set_page_config(page_title="🤖")
 
     if st.session_state.model is None:
-        st.session_state.model = create_model(GOOGLE_API_KEY, {})
+        st.session_state.model = create_model(GOOGLE_API_KEY)
 
     display_chat()
 

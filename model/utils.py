@@ -9,7 +9,7 @@ from build.func_tools import tools_func
 logger = setup_logger()
 actions = Actions()
 
-def create_model(api_key, profile):
+def create_model(api_key):
     """
     Create a GenerativeModel instance using the provided API key.
     """
@@ -30,6 +30,7 @@ def create_model(api_key, profile):
                     tools=tools_func
                     )   
         logger.info("Model created successfully")
+        print(model._system_instruction)
         return model
     except Exception as e:
         logger.error(f"Error creating model: {e}")
